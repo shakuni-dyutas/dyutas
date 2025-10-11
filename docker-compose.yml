@@ -1,0 +1,51 @@
+services:
+  web:
+    depends_on:
+      - auth-app # auth-app conatiner and its net config should be ready before nginx starts
+    image: nginx:1.28
+    container_name: dyutas-web
+    ports:
+      - 8010:443
+    networks:
+      - dyutas-network
+    volumes:
+      - ./dev_env/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./dev_env/certs:/etc/nginx/certs:ro
+    command: [nginx-debug, '-g', 'daemon off;']
+  auth-app:
+    build: ${AUTH_DOCKERFILE_PATH}
+    networks:
+      - dyutas-network
+    depends_on:
+      auth-rdb:
+        condition: service_healthy
+        restart: true
+  auth-rdb:
+    image: postgres:18
+    restart: always
+    volumes:
+      - type: volume
+        source: auth-rdb-volume
+        target: /var/lib/postgresql
+    ports:
+      - 8025:8025
+    networks:
+      - dyutas-network
+    environment:
+      POSTGRES_PASSWORD: ${AUTH_RDB_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    command: ["postgres", "-c", "port=8025"]
+        
+networks:
+  dyutas-network:
+    driver: bridge
+
+volumes:
+  auth-rdb-volume:
+    driver: local
+
