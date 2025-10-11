@@ -1,7 +1,13 @@
 services:
   web:
     depends_on:
-      - auth-app # auth-app conatiner and its net config should be ready before nginx starts
+    # each app container's network config should be ready before nginx starts
+      - auth-app
+      # - game-app
+      # - ai-app
+      # - stat-app
+      # - socket-app
+      - fe-app
     image: nginx:1.28
     container_name: dyutas-web
     ports:
@@ -34,12 +40,16 @@ services:
     environment:
       POSTGRES_PASSWORD: ${AUTH_RDB_PASSWORD}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres -p 8025"]
       interval: 5s
       timeout: 3s
       retries: 5
       start_period: 10s
-    command: ["postgres", "-c", "port=8025"]
+    command: ["-c", "port=8025"]
+  fe-app:
+    build: ${FE_DOCKERFILE_PATH}
+    networks:
+      - dyutas-network
         
 networks:
   dyutas-network:
