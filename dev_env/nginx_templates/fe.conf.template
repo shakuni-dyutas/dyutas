@@ -1,0 +1,16 @@
+server {
+    listen 443 ssl;
+    server_name local.dyutas.com;
+
+    ssl_certificate /etc/nginx/certs/${WEB_TLS_CERT_FILENAME};
+    ssl_certificate_key /etc/nginx/certs/${WEB_TLS_KEY_FILENAME};
+
+    location / {
+        proxy_pass http://fe-app:${FE_APP_PORT}; # forwarding to docker network
+        # proxy_pass http://host.docker.internal:${FE_APP_PORT}; # forwading to local host
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;  
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}

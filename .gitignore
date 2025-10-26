@@ -30,3 +30,6 @@ profile.cov
 
 # tmp
 tmp/
+
+# Mac
+.DS_Store
