@@ -42,11 +42,13 @@ services:
       - type: volume
         source: auth-rdb-volume
         target: /var/lib/postgresql
+      - ${AUTH_RDB_INIT_PATH}:/docker-entrypoint-initdb.d:ro
     ports:
       - ${AUTH_RDB_PORT}:${AUTH_RDB_PORT}
     networks:
       - dyutas-network
     environment:
+      POSTGRES_DB: ${AUTH_RDB_DB}
       POSTGRES_PASSWORD: ${AUTH_RDB_PASSWORD}
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${AUTH_RDB_USER} -d ${AUTH_RDB_DB} -p ${AUTH_RDB_PORT}"]
