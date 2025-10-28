@@ -26,7 +26,17 @@ services:
       - AUTH_APP_PORT=${AUTH_APP_PORT}
       - AUTH_RDB_PORT=${AUTH_RDB_PORT}
       - FE_APP_PORT=${FE_APP_PORT}
+      - API_DOCS_PORT=${API_DOCS_PORT}
     command: [nginx-debug, '-g', 'daemon off;']
+  api-docs:
+    depends_on:
+      - auth-app
+    image: swaggerapi/swagger-ui:latest
+    networks:
+      - dyutas-network
+    environment:
+      - SUPPORTED_SUBMIT_METHODS=["get", "put", "post", "delete", "options", "head", "patch", "trace"]
+      - URLS=[{url:"/auth/v1/openapi", name:"Auth Service"}]
   auth-app:
     build: ${AUTH_DOCKERFILE_PATH}
     networks:

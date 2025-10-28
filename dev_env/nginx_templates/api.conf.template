@@ -3,7 +3,21 @@ server {
     server_name local-api.dyutas.com;
 
     ssl_certificate /etc/nginx/certs/${WEB_TLS_CERT_FILENAME};
-    ssl_certificate_key /etc/nginx/certs/${WEB_TLS_KEY_FILENAME}; 
+    ssl_certificate_key /etc/nginx/certs/${WEB_TLS_KEY_FILENAME};
+
+    location /openapi {
+        proxy_pass http://api-docs:8080/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;  
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        sub_filter_types text/html;
+        sub_filter 'href="./' 'href="/openapi/';
+        sub_filter 'href="' 'href="/openapi/';
+        sub_filter 'src="./' 'src="/openapi/';
+        sub_filter_once off;
+    }
 
     location /auth {
         proxy_pass http://auth-app:${AUTH_APP_PORT}; # forwarding to docker network
