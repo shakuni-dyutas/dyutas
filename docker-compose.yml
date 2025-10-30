@@ -45,6 +45,16 @@ services:
       auth-rdb:
         condition: service_healthy
         restart: true
+    environment:
+      - AUTH_APP_PORT=${AUTH_APP_PORT}
+      - AUTH_RDB_HOST=${AUTH_RDB_HOST}
+      - AUTH_RDB_PORT=${AUTH_RDB_PORT}
+      - AUTH_RDB_DB=${AUTH_RDB_DB}
+      - AUTH_RDB_USER=${AUTH_RDB_USER}
+      - AUTH_RDB_PASSWORD=${AUTH_RDB_PASSWORD}
+      - AUTH_APP_JWT_KEY=${AUTH_APP_JWT_KEY}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
   auth-rdb:
     image: postgres:18
     restart: always
